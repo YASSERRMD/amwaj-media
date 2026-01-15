@@ -61,7 +61,7 @@ impl AudioProcessor {
         let float_data = pcm_to_float(pcm_data);
 
         // Apply voice isolation if available
-        let isolated = if let Some(vi) = &self.voice_isolation {
+        let isolated = if let Some(vi) = &mut self.voice_isolation {
             vi.isolate(&float_data)?
         } else {
             float_data
@@ -89,7 +89,7 @@ impl AudioProcessor {
         self.frames_processed += 1;
 
         // Apply voice isolation if available
-        let isolated = if let Some(vi) = &self.voice_isolation {
+        let isolated = if let Some(vi) = &mut self.voice_isolation {
             vi.isolate(float_data)?
         } else {
             float_data.to_vec()
