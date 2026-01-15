@@ -1,6 +1,5 @@
-
 <div align="center">
-  <img src="https://raw.githubusercontent.com/YASSERRMD/amwaj-media/main/assets/amwaj_logo_v1.png" alt="Amwaj Media Server Logo" width="200" height="200" />
+  <img src="https://raw.githubusercontent.com/YASSERRMD/amwaj-media/main/assets/amwaj_logo_wavy.png" alt="Amwaj Media Server Logo" width="300" />
   
   # Amwaj Media Server
 
@@ -26,7 +25,7 @@
 
 **Amwaj** (Arabic for *waves*) is a specialized media server built in Rust, designed to handle the critical I/O layer for conversational AI agents. It bridges the gap between WebRTC clients and AI orchestrators, providing ultra-low latency audio streaming, advanced voice processing, and seamless turn-taking orchestration.
 
-Designed for scalability and performance, Amwaj handles the "dirty work" of real-time audio—jitter buffering, packet loss concealment, VAD, and voice isolation—so your AI models can focus on intelligence.
+Designed for scalability and performance, Amwaj handles the "dirty work" of real-time audio - jitter buffering, packet loss concealment, VAD, and voice isolation - so your AI models can focus on intelligence.
 
 ## Features
 
