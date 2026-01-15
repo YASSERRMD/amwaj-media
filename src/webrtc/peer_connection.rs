@@ -58,14 +58,13 @@ impl PeerConnection {
     /// Create SDP answer
     pub fn create_answer(&mut self) -> anyhow::Result<String> {
         // TODO: Implement proper SDP answer creation
-        let answer = format!(
-            "v=0\r\n\
+        let answer = "v=0\r\n\
              o=- 0 0 IN IP4 127.0.0.1\r\n\
              s=Amwaj Media Server\r\n\
              t=0 0\r\n\
              m=audio 0 RTP/AVP 111\r\n\
              a=rtpmap:111 opus/48000/2\r\n"
-        );
+            .to_string();
         self.local_sdp = Some(answer.clone());
         Ok(answer)
     }
