@@ -3,7 +3,7 @@ name = "amwaj-media"
 version = "0.1.0"
 edition = "2021"
 authors = ["YASSERRMD"]
-license = "Apache-2.0"
+license = "MIT"
 description = "Real-time media server for voice agents"
 repository = "https://github.com/amwaj-io/amwaj-media"
 
