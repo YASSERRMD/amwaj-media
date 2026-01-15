@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amwaj-media
+  namespace: production
+  labels:
+    app: amwaj-media
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: amwaj-media
+  template:
+    metadata:
+      labels:
+        app: amwaj-media
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: amwaj-media
+        image: amwaj-io/amwaj-media:latest
+        imagePullPolicy: Always
+        ports:
+        - name: grpc
+          containerPort: 50051
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: RUST_LOG
+          value: "info,amwaj_media=debug"
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: amwaj-secrets
+              key: redis-url
+              optional: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          tcpSocket:
+            port: grpc
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: grpc
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.toml
+          subPath: config.toml
+        - name: models
+          mountPath: /app/models
+      volumes:
+      - name: config
+        configMap:
+          name: amwaj-config
+      - name: models
+        persistentVolumeClaim:
+          claimName: amwaj-models-pvc
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: amwaj-media
+              topologyKey: kubernetes.io/hostname
