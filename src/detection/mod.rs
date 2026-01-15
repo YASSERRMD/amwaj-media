@@ -1,7 +1,7 @@
 //! Turn detection module for Amwaj Media Server
 
-pub mod turn_detection;
 pub mod multi_signal;
+pub mod turn_detection;
 
-pub use turn_detection::{TurnDetectionEngine, TurnDetectionConfig, TurnState, TurnEvent};
 pub use multi_signal::MultiSignalFusion;
+pub use turn_detection::{TurnDetectionConfig, TurnDetectionEngine, TurnEvent, TurnState};

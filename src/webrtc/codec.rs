@@ -10,7 +10,7 @@ pub struct OpusDecoder {
 
 impl OpusDecoder {
     /// Create a new Opus decoder
-    /// 
+    ///
     /// # Arguments
     /// * `sample_rate` - Output sample rate (typically 16000 or 48000)
     pub fn new(sample_rate: u32) -> Self {
@@ -31,16 +31,16 @@ impl OpusDecoder {
     }
 
     /// Decode Opus data to PCM samples
-    /// 
+    ///
     /// # Arguments
     /// * `opus_data` - Opus encoded audio data
-    /// 
+    ///
     /// # Returns
     /// * PCM samples as i16 values
     pub fn decode(&self, opus_data: &[u8]) -> anyhow::Result<Vec<i16>> {
         // TODO: Integrate actual opus crate for real decoding
         // For now, return a placeholder that simulates decoded output
-        
+
         if opus_data.is_empty() {
             return Err(anyhow::anyhow!("Empty opus data"));
         }
@@ -87,16 +87,16 @@ impl OpusEncoder {
     }
 
     /// Encode PCM samples to Opus
-    /// 
+    ///
     /// # Arguments
     /// * `pcm_data` - PCM samples as i16 values
-    /// 
+    ///
     /// # Returns
     /// * Opus encoded data
     pub fn encode(&self, pcm_data: &[i16]) -> anyhow::Result<Vec<u8>> {
         // TODO: Integrate actual opus crate for real encoding
         // For now, return a placeholder
-        
+
         if pcm_data.is_empty() {
             return Err(anyhow::anyhow!("Empty PCM data"));
         }
@@ -107,7 +107,8 @@ impl OpusEncoder {
 
     /// Encode PCM float samples to Opus
     pub fn encode_float(&self, pcm_data: &[f32]) -> anyhow::Result<Vec<u8>> {
-        let pcm_i16: Vec<i16> = pcm_data.iter()
+        let pcm_i16: Vec<i16> = pcm_data
+            .iter()
             .map(|&s| (s * 32767.0).clamp(-32768.0, 32767.0) as i16)
             .collect();
         self.encode(&pcm_i16)
@@ -129,10 +130,10 @@ mod tests {
     fn test_decode_stub() {
         let decoder = OpusDecoder::new(16000);
         let opus_data = vec![0xFF; 100];
-        
+
         let result = decoder.decode(&opus_data);
         assert!(result.is_ok());
-        
+
         let pcm = result.unwrap();
         assert_eq!(pcm.len(), 320); // 20ms at 16kHz mono
     }
@@ -148,7 +149,7 @@ mod tests {
     fn test_encoder_creation() {
         let encoder = OpusEncoder::new(16000, 24000);
         let pcm_data = vec![0i16; 320];
-        
+
         let result = encoder.encode(&pcm_data);
         assert!(result.is_ok());
     }

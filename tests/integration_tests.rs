@@ -2,7 +2,7 @@
 mod tests {
     use amwaj_media::config::Config;
     use amwaj_media::metrics::Metrics;
-    
+
     #[test]
     fn test_config_load_default() {
         let config = Config::default();

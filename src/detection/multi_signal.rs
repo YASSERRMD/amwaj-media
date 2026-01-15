@@ -40,7 +40,7 @@ impl MultiSignalFusion {
     ) -> f32 {
         // Normalize volume: map -50db to 0db range to 0-1
         let volume_normalized = ((features.volume_db + 50.0) / 50.0).clamp(0.0, 1.0);
-        
+
         // Pitch score: human speech typically 50-400 Hz
         let pitch_score = if features.pitch_hz > 50.0 && features.pitch_hz < 400.0 {
             1.0
@@ -124,7 +124,7 @@ mod tests {
     fn test_fusion_high_confidence() {
         let fusion = MultiSignalFusion::new();
         let features = create_features(-20.0, 200.0);
-        
+
         let score = fusion.fuse_signals(0.9, &features, None);
         assert!(score > 0.7);
     }
@@ -133,7 +133,7 @@ mod tests {
     fn test_fusion_low_confidence() {
         let fusion = MultiSignalFusion::new();
         let features = create_features(-60.0, 0.0);
-        
+
         let score = fusion.fuse_signals(0.1, &features, None);
         assert!(score < 0.3);
     }
@@ -142,11 +142,11 @@ mod tests {
     fn test_context_boost() {
         let fusion = MultiSignalFusion::new();
         let features = create_features(-30.0, 150.0);
-        
+
         let score_neutral = fusion.fuse_signals(0.5, &features, None);
         let score_expecting = fusion.fuse_signals(0.5, &features, Some("expecting_response"));
         let score_playing = fusion.fuse_signals(0.5, &features, Some("playing_audio"));
-        
+
         assert!(score_expecting > score_neutral);
         assert!(score_playing < score_neutral);
     }
@@ -154,7 +154,7 @@ mod tests {
     #[test]
     fn test_confidence_levels() {
         let fusion = MultiSignalFusion::new();
-        
+
         assert_eq!(fusion.confidence_level(0.9), ConfidenceLevel::High);
         assert_eq!(fusion.confidence_level(0.6), ConfidenceLevel::Medium);
         assert_eq!(fusion.confidence_level(0.3), ConfidenceLevel::Low);
@@ -165,7 +165,7 @@ mod tests {
     fn test_custom_weights() {
         let fusion = MultiSignalFusion::with_weights(0.8, 0.1, 0.05, 0.05);
         let features = create_features(-20.0, 200.0);
-        
+
         // With higher VAD weight, high VAD should dominate
         let score = fusion.fuse_signals(0.9, &features, None);
         assert!(score > 0.7);
@@ -175,9 +175,9 @@ mod tests {
     fn test_clamping() {
         let fusion = MultiSignalFusion::new();
         let features = create_features(10.0, 300.0); // Very loud
-        
+
         let score = fusion.fuse_signals(1.0, &features, Some("expecting_response"));
-        
+
         // Should be clamped to 1.0
         assert!(score <= 1.0);
         assert!(score >= 0.0);

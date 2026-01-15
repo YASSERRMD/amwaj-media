@@ -1,7 +1,9 @@
 #[cfg(test)]
 mod turn_detection_tests {
-    use amwaj_media::detection::{TurnDetectionEngine, TurnDetectionConfig, TurnEvent, TurnState, MultiSignalFusion};
     use amwaj_media::audio::AudioFeatures;
+    use amwaj_media::detection::{
+        MultiSignalFusion, TurnDetectionConfig, TurnDetectionEngine, TurnEvent, TurnState,
+    };
 
     fn create_features(volume_db: f32) -> AudioFeatures {
         AudioFeatures {
@@ -77,7 +79,10 @@ mod turn_detection_tests {
         }
 
         // Short speech should be ignored
-        assert!(!received_turn_ended, "Short speech should not trigger turn ended");
+        assert!(
+            !received_turn_ended,
+            "Short speech should not trigger turn ended"
+        );
     }
 
     #[test]
@@ -96,10 +101,10 @@ mod turn_detection_tests {
         for _ in 0..5 {
             engine.process(0.1, &features, 20);
         }
-        
+
         // Resume speaking before silence threshold
         engine.process(0.8, &features, 20);
-        
+
         assert_eq!(engine.state(), TurnState::Speaking);
     }
 

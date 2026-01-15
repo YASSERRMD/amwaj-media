@@ -14,7 +14,7 @@ pub struct JitterBuffer {
 
 impl JitterBuffer {
     /// Create a new jitter buffer
-    /// 
+    ///
     /// # Arguments
     /// * `max_size_ms` - Maximum buffer size in milliseconds
     /// * `sample_rate` - Audio sample rate in Hz
@@ -32,7 +32,7 @@ impl JitterBuffer {
     /// Insert a packet into the buffer
     pub fn insert(&mut self, sequence_num: u16, data: Vec<u8>) {
         self.packets_received += 1;
-        
+
         // Check for packet loss
         if let Some(last_seq) = self.last_sequence {
             let expected = last_seq.wrapping_add(1);
@@ -42,9 +42,9 @@ impl JitterBuffer {
                 self.packets_lost += lost;
             }
         }
-        
+
         self.buffer.insert(sequence_num, data);
-        
+
         // Limit buffer size
         let max_packets = self.max_packets();
         while self.buffer.len() > max_packets {
@@ -71,7 +71,7 @@ impl JitterBuffer {
     /// Get all ready frames up to a certain count
     pub fn get_ready_frames(&mut self, max_count: usize) -> Vec<Vec<u8>> {
         let mut frames = Vec::with_capacity(max_count);
-        
+
         for _ in 0..max_count {
             if let Some(frame) = self.get_ready_frame() {
                 frames.push(frame);
@@ -79,7 +79,7 @@ impl JitterBuffer {
                 break;
             }
         }
-        
+
         frames
     }
 
@@ -138,10 +138,10 @@ mod tests {
     #[test]
     fn test_insert_and_retrieve() {
         let mut buffer = JitterBuffer::new(100, 16000);
-        
+
         let data = vec![0x01, 0x02, 0x03];
         buffer.insert(100, data.clone());
-        
+
         let retrieved = buffer.get_ready_frame();
         assert_eq!(retrieved, Some(data));
     }
@@ -149,12 +149,12 @@ mod tests {
     #[test]
     fn test_ordering() {
         let mut buffer = JitterBuffer::new(100, 16000);
-        
+
         // Insert out of order
         buffer.insert(102, vec![3]);
         buffer.insert(100, vec![1]);
         buffer.insert(101, vec![2]);
-        
+
         // Should retrieve in order
         assert_eq!(buffer.get_ready_frame(), Some(vec![1]));
         assert_eq!(buffer.get_ready_frame(), Some(vec![2]));
@@ -171,13 +171,13 @@ mod tests {
     #[test]
     fn test_is_ready() {
         let mut buffer = JitterBuffer::new(100, 16000);
-        
+
         assert!(!buffer.is_ready(3));
-        
+
         buffer.insert(1, vec![1]);
         buffer.insert(2, vec![2]);
         buffer.insert(3, vec![3]);
-        
+
         assert!(buffer.is_ready(3));
     }
 }

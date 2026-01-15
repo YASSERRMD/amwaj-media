@@ -42,7 +42,7 @@ impl VoiceActivityDetector {
 
         // Calculate frame energy
         let energy = audio.iter().map(|x| x * x).sum::<f32>() / audio.len() as f32;
-        
+
         // Calculate raw probability based on energy
         let raw_prob = if energy > self.energy_threshold {
             // Logarithmic scaling for better sensitivity
@@ -53,9 +53,9 @@ impl VoiceActivityDetector {
         };
 
         // Apply temporal smoothing
-        let smoothed_prob = self.smoothing_factor * raw_prob 
-            + (1.0 - self.smoothing_factor) * self.previous_prob;
-        
+        let smoothed_prob =
+            self.smoothing_factor * raw_prob + (1.0 - self.smoothing_factor) * self.previous_prob;
+
         self.previous_prob = smoothed_prob;
 
         Ok(smoothed_prob)
@@ -63,9 +63,7 @@ impl VoiceActivityDetector {
 
     /// Process PCM i16 audio frame
     pub fn process_i16(&mut self, audio: &[i16]) -> anyhow::Result<f32> {
-        let float_audio: Vec<f32> = audio.iter()
-            .map(|&s| s as f32 / 32768.0)
-            .collect();
+        let float_audio: Vec<f32> = audio.iter().map(|&s| s as f32 / 32768.0).collect();
         self.process(&float_audio)
     }
 
@@ -107,7 +105,7 @@ mod tests {
     fn test_vad_silence() {
         let mut vad = VoiceActivityDetector::new(16000);
         let silent_audio = vec![0.0f32; 320];
-        
+
         let prob = vad.process(&silent_audio).unwrap();
         assert!(prob < 0.1);
     }
@@ -115,10 +113,10 @@ mod tests {
     #[test]
     fn test_vad_voice() {
         let mut vad = VoiceActivityDetector::new(16000);
-        
+
         // Create high-energy "voice" signal
         let voice_audio = vec![0.5f32; 320];
-        
+
         let prob = vad.process(&voice_audio).unwrap();
         assert!(prob > 0.5);
     }
@@ -126,11 +124,11 @@ mod tests {
     #[test]
     fn test_vad_smoothing() {
         let mut vad = VoiceActivityDetector::new(16000);
-        
+
         // Process silence then voice, check smoothing
         let _prob1 = vad.process(&vec![0.0f32; 320]).unwrap();
         let prob2 = vad.process(&vec![0.5f32; 320]).unwrap();
-        
+
         // Due to smoothing, prob2 shouldn't immediately jump to max
         assert!(prob2 > 0.0 && prob2 < 1.0);
     }
@@ -138,10 +136,10 @@ mod tests {
     #[test]
     fn test_vad_reset() {
         let mut vad = VoiceActivityDetector::new(16000);
-        
+
         vad.process(&vec![0.5f32; 320]).unwrap();
         assert!(vad.frames_processed() > 0);
-        
+
         vad.reset();
         assert_eq!(vad.frames_processed(), 0);
     }

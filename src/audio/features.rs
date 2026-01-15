@@ -31,10 +31,10 @@ pub fn calculate_volume(audio: &[f32]) -> f32 {
     if audio.is_empty() {
         return f32::NEG_INFINITY;
     }
-    
+
     let mean_square: f32 = audio.iter().map(|x| x * x).sum::<f32>() / audio.len() as f32;
     let rms = mean_square.sqrt();
-    
+
     if rms > 0.0 {
         20.0 * rms.log10()
     } else {
@@ -50,8 +50,8 @@ pub fn estimate_pitch(audio: &[f32], sample_rate: u32) -> f32 {
 
     // Simple autocorrelation-based pitch detection
     let min_period = (sample_rate / 400) as usize; // Max 400 Hz
-    let max_period = (sample_rate / 50) as usize;  // Min 50 Hz
-    
+    let max_period = (sample_rate / 50) as usize; // Min 50 Hz
+
     if max_period >= audio.len() || min_period >= max_period {
         return 0.0;
     }
@@ -63,19 +63,19 @@ pub fn estimate_pitch(audio: &[f32], sample_rate: u32) -> f32 {
         let mut correlation = 0.0f32;
         let mut norm1 = 0.0f32;
         let mut norm2 = 0.0f32;
-        
+
         for i in 0..(audio.len() - period) {
             correlation += audio[i] * audio[i + period];
             norm1 += audio[i] * audio[i];
             norm2 += audio[i + period] * audio[i + period];
         }
-        
+
         let normalized = if norm1 > 0.0 && norm2 > 0.0 {
             correlation / (norm1.sqrt() * norm2.sqrt())
         } else {
             0.0
         };
-        
+
         if normalized > best_correlation {
             best_correlation = normalized;
             best_period = period;
@@ -95,7 +95,8 @@ pub fn calculate_zero_crossing_rate(audio: &[f32]) -> f32 {
         return 0.0;
     }
 
-    let crossings: usize = audio.windows(2)
+    let crossings: usize = audio
+        .windows(2)
         .filter(|w| (w[0] >= 0.0 && w[1] < 0.0) || (w[0] < 0.0 && w[1] >= 0.0))
         .count();
 
@@ -146,7 +147,9 @@ mod tests {
     #[test]
     fn test_zero_crossing_rate() {
         // Alternating signal has high ZCR
-        let audio: Vec<f32> = (0..100).map(|i| if i % 2 == 0 { 0.5 } else { -0.5 }).collect();
+        let audio: Vec<f32> = (0..100)
+            .map(|i| if i % 2 == 0 { 0.5 } else { -0.5 })
+            .collect();
         let zcr = calculate_zero_crossing_rate(&audio);
         assert!(zcr > 0.9);
     }

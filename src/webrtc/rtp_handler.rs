@@ -19,7 +19,10 @@ impl RtpPacket {
     /// Parse an RTP packet from raw bytes
     pub fn parse(data: &[u8]) -> anyhow::Result<Self> {
         if data.len() < 12 {
-            return Err(anyhow::anyhow!("RTP packet too short: {} bytes", data.len()));
+            return Err(anyhow::anyhow!(
+                "RTP packet too short: {} bytes",
+                data.len()
+            ));
         }
 
         let version = (data[0] >> 6) & 0x3;
@@ -37,7 +40,7 @@ impl RtpPacket {
         let ssrc = u32::from_be_bytes([data[8], data[9], data[10], data[11]]);
 
         let header_size = 12 + (csrc_count as usize * 4);
-        
+
         if data.len() < header_size {
             return Err(anyhow::anyhow!("RTP packet header incomplete"));
         }
@@ -62,30 +65,30 @@ impl RtpPacket {
     /// Serialize the RTP packet back to bytes
     pub fn serialize(&self) -> Vec<u8> {
         let mut data = Vec::with_capacity(12 + self.payload.len());
-        
+
         // First byte: V=2, P, X, CC
-        let byte0 = (self.version << 6) 
+        let byte0 = (self.version << 6)
             | if self.padding { 0x20 } else { 0 }
             | if self.extension { 0x10 } else { 0 }
             | (self.csrc_count & 0x0F);
         data.push(byte0);
-        
+
         // Second byte: M, PT
         let byte1 = if self.marker { 0x80 } else { 0 } | (self.payload_type & 0x7F);
         data.push(byte1);
-        
+
         // Sequence number (2 bytes)
         data.extend_from_slice(&self.sequence_number.to_be_bytes());
-        
+
         // Timestamp (4 bytes)
         data.extend_from_slice(&self.timestamp.to_be_bytes());
-        
+
         // SSRC (4 bytes)
         data.extend_from_slice(&self.ssrc.to_be_bytes());
-        
+
         // Payload
         data.extend_from_slice(&self.payload);
-        
+
         data
     }
 
@@ -102,10 +105,10 @@ mod tests {
     #[test]
     fn test_parse_valid_packet() {
         let data = vec![
-            0x80, 0x78, 0x00, 0x01,  // Version=2, marker=0, PT=120, seq=1
-            0x00, 0x00, 0x00, 0x00,  // Timestamp
-            0x00, 0x00, 0x00, 0x01,  // SSRC
-            0xAA, 0xBB, 0xCC, 0xDD,  // Payload
+            0x80, 0x78, 0x00, 0x01, // Version=2, marker=0, PT=120, seq=1
+            0x00, 0x00, 0x00, 0x00, // Timestamp
+            0x00, 0x00, 0x00, 0x01, // SSRC
+            0xAA, 0xBB, 0xCC, 0xDD, // Payload
         ];
 
         let packet = RtpPacket::parse(&data).expect("Failed to parse RTP packet");
@@ -138,7 +141,7 @@ mod tests {
 
         let serialized = original.serialize();
         let parsed = RtpPacket::parse(&serialized).expect("Failed to parse");
-        
+
         assert_eq!(parsed.version, original.version);
         assert_eq!(parsed.marker, original.marker);
         assert_eq!(parsed.payload_type, original.payload_type);

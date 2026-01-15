@@ -119,10 +119,10 @@ mod tests {
     #[test]
     fn test_latency_tracker_timing() {
         let tracker = LatencyTracker::new("test");
-        
+
         // Wait a bit
         sleep(Duration::from_millis(10));
-        
+
         let elapsed = tracker.elapsed_ms();
         assert!(elapsed >= 9.0); // Allow some tolerance
     }
@@ -130,9 +130,9 @@ mod tests {
     #[test]
     fn test_latency_tracker_record() {
         let mut tracker = LatencyTracker::new("test");
-        
+
         sleep(Duration::from_millis(5));
-        
+
         let recorded = tracker.record();
         assert!(recorded >= 4.0);
         assert!(tracker.is_recorded());
@@ -142,18 +142,18 @@ mod tests {
     fn test_scoped_timer() {
         use std::sync::atomic::{AtomicBool, Ordering};
         use std::sync::Arc;
-        
+
         let called = Arc::new(AtomicBool::new(false));
         let called_clone = Arc::clone(&called);
-        
+
         {
             let _timer = ScopedTimer::new("test", move |_elapsed| {
                 called_clone.store(true, Ordering::SeqCst);
             });
-            
+
             sleep(Duration::from_millis(5));
         }
-        
+
         assert!(called.load(Ordering::SeqCst));
     }
 
@@ -161,7 +161,7 @@ mod tests {
     fn test_scoped_timer_simple() {
         let timer = ScopedTimer::simple("test");
         sleep(Duration::from_millis(5));
-        
+
         assert!(timer.elapsed_ms() >= 4.0);
     }
 }

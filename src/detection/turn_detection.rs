@@ -241,7 +241,7 @@ mod tests {
     fn test_idle_to_speaking() {
         let mut engine = TurnDetectionEngine::new(TurnDetectionConfig::default());
         let features = create_features(-20.0);
-        
+
         let event = engine.process(0.8, &features, 20);
         assert_eq!(event, TurnEvent::TurnStarted);
         assert_eq!(engine.state(), TurnState::Speaking);
@@ -251,10 +251,10 @@ mod tests {
     fn test_speaking_to_silence_gap() {
         let mut engine = TurnDetectionEngine::new(TurnDetectionConfig::default());
         let features = create_features(-20.0);
-        
+
         // Start speaking
         engine.process(0.8, &features, 20);
-        
+
         // Low VAD should transition to silence gap
         engine.process(0.1, &features, 20);
         assert_eq!(engine.state(), TurnState::SilenceGap);
@@ -269,21 +269,21 @@ mod tests {
             max_silence_duration_ms: 200,
             volume_threshold_db: -40.0,
         };
-        
+
         let mut engine = TurnDetectionEngine::new(config);
         let features = create_features(-20.0);
-        
+
         // Start speaking
         engine.process(0.8, &features, 20);
-        
+
         // Continue speaking for enough time
         for _ in 0..10 {
             engine.process(0.8, &features, 20);
         }
-        
+
         // Enter silence gap
         engine.process(0.1, &features, 20);
-        
+
         // Wait for silence duration
         let mut turn_ended = false;
         for _ in 0..15 {
@@ -292,7 +292,7 @@ mod tests {
                 break;
             }
         }
-        
+
         assert!(turn_ended);
         assert_eq!(engine.state(), TurnState::Idle);
     }
@@ -301,14 +301,14 @@ mod tests {
     fn test_speech_resume() {
         let mut engine = TurnDetectionEngine::new(TurnDetectionConfig::default());
         let features = create_features(-20.0);
-        
+
         // Start speaking
         engine.process(0.8, &features, 20);
-        
+
         // Brief silence
         engine.process(0.1, &features, 20);
         assert_eq!(engine.state(), TurnState::SilenceGap);
-        
+
         // Resume speaking
         engine.process(0.8, &features, 20);
         assert_eq!(engine.state(), TurnState::Speaking);
@@ -318,10 +318,10 @@ mod tests {
     fn test_reset() {
         let mut engine = TurnDetectionEngine::new(TurnDetectionConfig::default());
         let features = create_features(-20.0);
-        
+
         engine.process(0.8, &features, 20);
         assert_eq!(engine.state(), TurnState::Speaking);
-        
+
         engine.reset();
         assert_eq!(engine.state(), TurnState::Idle);
         assert_eq!(engine.speech_duration_ms(), 0);

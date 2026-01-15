@@ -1,8 +1,8 @@
 //! gRPC server implementation
 
 use crate::config::Config;
-use crate::metrics::Metrics;
 use crate::grpc::service::AmwajMediaService;
+use crate::metrics::Metrics;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 
@@ -32,24 +32,24 @@ impl GrpcServer {
         // For now, we use a TCP listener as a stub
         // Full tonic gRPC server will be added when proto compilation is integrated
         let listener = TcpListener::bind(&addr).await?;
-        
+
         tracing::info!("Server listening on {}", addr);
-        
+
         // Create service for validation
         let _service = self.create_service();
-        
+
         loop {
             let (socket, peer_addr) = listener.accept().await?;
             let metrics = Arc::clone(&self.metrics);
-            
+
             tokio::spawn(async move {
                 tracing::debug!("New connection from {}", peer_addr);
                 metrics.active_connections.inc();
-                
+
                 // Handle connection (stub for now)
                 // Real gRPC handling would use tonic here
                 drop(socket);
-                
+
                 metrics.active_connections.dec();
             });
         }
@@ -65,15 +65,15 @@ impl GrpcServer {
         tracing::info!("gRPC server starting on {}", addr);
 
         let listener = TcpListener::bind(&addr).await?;
-        
+
         tracing::info!("Server listening on {} (with graceful shutdown)", addr);
-        
+
         loop {
             tokio::select! {
                 accept_result = listener.accept() => {
                     let (socket, peer_addr) = accept_result?;
                     let metrics = Arc::clone(&self.metrics);
-                    
+
                     tokio::spawn(async move {
                         tracing::debug!("New connection from {}", peer_addr);
                         metrics.active_connections.inc();
@@ -106,7 +106,7 @@ mod tests {
         let config = Config::default();
         let metrics = Arc::new(Metrics::new(&config));
         let server = GrpcServer::new(config, metrics);
-        
+
         assert_eq!(server.address(), "0.0.0.0:50051");
     }
 
@@ -115,7 +115,7 @@ mod tests {
         let config = Config::default();
         let metrics = Arc::new(Metrics::new(&config));
         let server = GrpcServer::new(config, metrics);
-        
+
         let service = server.create_service();
         assert_eq!(service.config().server.port, 50051);
     }
@@ -132,20 +132,18 @@ mod tests {
         };
         let metrics = Arc::new(Metrics::new(&config));
         let server = GrpcServer::new(config, metrics);
-        
+
         let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
-        
+
         // Start server in background
-        let handle = tokio::spawn(async move {
-            server.start_with_shutdown(shutdown_rx).await
-        });
-        
+        let handle = tokio::spawn(async move { server.start_with_shutdown(shutdown_rx).await });
+
         // Give server time to start
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        
+
         // Send shutdown signal
         let _ = shutdown_tx.send(());
-        
+
         // Wait for server to stop
         let result = handle.await;
         assert!(result.is_ok());

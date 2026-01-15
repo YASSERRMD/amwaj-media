@@ -1,9 +1,9 @@
 //! gRPC Service Implementation
 
-use std::sync::Arc;
-use tokio::sync::mpsc;
 use crate::config::Config;
 use crate::metrics::Metrics;
+use std::sync::Arc;
+use tokio::sync::mpsc;
 
 /// gRPC Media Service handler
 pub struct AmwajMediaService {
@@ -103,7 +103,11 @@ impl SessionHandler {
         session_id: String,
         config: Arc<Config>,
         metrics: Arc<Metrics>,
-    ) -> (Self, mpsc::Receiver<MediaEvent>, mpsc::Sender<OrchestrationCommand>) {
+    ) -> (
+        Self,
+        mpsc::Receiver<MediaEvent>,
+        mpsc::Sender<OrchestrationCommand>,
+    ) {
         let (event_tx, event_rx) = mpsc::channel(100);
         let (command_tx, command_rx) = mpsc::channel(100);
 
@@ -199,7 +203,7 @@ mod tests {
         let config = Config::default();
         let metrics = Arc::new(Metrics::new(&config));
         let service = AmwajMediaService::new(config, metrics);
-        
+
         assert_eq!(service.config().server.port, 50051);
     }
 
@@ -207,24 +211,21 @@ mod tests {
     async fn test_session_handler() {
         let config = Arc::new(Config::default());
         let metrics = Arc::new(Metrics::new(&config));
-        
-        let (handler, mut event_rx, _command_tx) = SessionHandler::new(
-            "test-session".to_string(),
-            config,
-            metrics,
-        );
-        
+
+        let (handler, mut event_rx, _command_tx) =
+            SessionHandler::new("test-session".to_string(), config, metrics);
+
         assert_eq!(handler.session_id(), "test-session");
-        
+
         // Send an event
         let event = MediaEvent::TurnStarted {
             session_id: "test-session".to_string(),
             timestamp_ms: 1000,
             vad_probability: 0.8,
         };
-        
+
         handler.send_event(event).await.unwrap();
-        
+
         // Receive the event
         let received = event_rx.recv().await;
         assert!(received.is_some());
@@ -233,15 +234,15 @@ mod tests {
     #[test]
     fn test_message_buffer() {
         let mut buffer: MessageBuffer<i32> = MessageBuffer::new(3);
-        
+
         assert!(buffer.push(1));
         assert!(buffer.push(2));
         assert!(buffer.push(3));
         assert!(!buffer.push(4)); // Buffer full
-        
+
         assert!(buffer.is_full());
         assert_eq!(buffer.len(), 3);
-        
+
         let drained = buffer.drain();
         assert_eq!(drained, vec![1, 2, 3]);
         assert!(buffer.is_empty());

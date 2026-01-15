@@ -1,8 +1,8 @@
 //! WebRTC Peer Connection Handler
 
 use crate::webrtc::{JitterBuffer, OpusDecoder, RtpPacket};
-use std::sync::Arc;
 use parking_lot::Mutex;
+use std::sync::Arc;
 
 /// Represents a WebRTC peer connection
 pub struct PeerConnection {
@@ -73,21 +73,21 @@ impl PeerConnection {
     /// Handle incoming RTP packet
     pub fn on_rtp_packet(&mut self, packet_data: &[u8]) -> anyhow::Result<Option<Vec<i16>>> {
         let packet = RtpPacket::parse(packet_data)?;
-        
+
         self.packets_processed += 1;
-        
+
         // Insert into jitter buffer
         {
             let mut buffer = self.jitter_buffer.lock();
             buffer.insert(packet.sequence_number, packet.payload.clone());
         }
-        
+
         // Try to get a ready frame and decode it
         let frame = {
             let mut buffer = self.jitter_buffer.lock();
             buffer.get_ready_frame()
         };
-        
+
         if let Some(opus_data) = frame {
             let pcm = self.decoder.decode(&opus_data)?;
             Ok(Some(pcm))
@@ -141,7 +141,7 @@ mod tests {
     fn test_set_remote_sdp() {
         let mut peer = PeerConnection::new("test".to_string());
         let sdp = "v=0\r\no=...".to_string();
-        
+
         assert!(peer.set_remote_sdp(sdp.clone()).is_ok());
         assert_eq!(peer.remote_sdp(), Some(&sdp));
     }
@@ -150,7 +150,7 @@ mod tests {
     fn test_create_answer() {
         let mut peer = PeerConnection::new("test".to_string());
         let answer = peer.create_answer();
-        
+
         assert!(answer.is_ok());
         let answer_str = answer.unwrap();
         assert!(answer_str.contains("v=0"));
@@ -160,15 +160,15 @@ mod tests {
     #[test]
     fn test_rtp_packet_handling() {
         let mut peer = PeerConnection::new("test".to_string());
-        
+
         // Create a valid RTP packet
         let rtp_data = vec![
-            0x80, 0x6F, 0x00, 0x01,  // Version=2, PT=111 (opus), seq=1
-            0x00, 0x00, 0x00, 0x00,  // Timestamp
-            0x00, 0x00, 0x00, 0x01,  // SSRC
-            0xAA, 0xBB, 0xCC, 0xDD,  // Payload (opus data)
+            0x80, 0x6F, 0x00, 0x01, // Version=2, PT=111 (opus), seq=1
+            0x00, 0x00, 0x00, 0x00, // Timestamp
+            0x00, 0x00, 0x00, 0x01, // SSRC
+            0xAA, 0xBB, 0xCC, 0xDD, // Payload (opus data)
         ];
-        
+
         let result = peer.on_rtp_packet(&rtp_data);
         assert!(result.is_ok());
         assert_eq!(peer.packets_processed(), 1);

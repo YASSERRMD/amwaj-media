@@ -1,7 +1,7 @@
 //! Audio Processor - Main audio processing pipeline
 
-use crate::audio::{AudioFeatures, VoiceActivityDetector, VoiceIsolation};
 use crate::audio::features::extract_features;
+use crate::audio::{AudioFeatures, VoiceActivityDetector, VoiceIsolation};
 
 /// Main audio processor that orchestrates the audio pipeline
 pub struct AudioProcessor {
@@ -38,7 +38,11 @@ impl AudioProcessor {
     }
 
     /// Create with voice isolation enabled
-    pub fn with_voice_isolation(sample_rate: u32, frame_size: usize, model_path: String) -> anyhow::Result<Self> {
+    pub fn with_voice_isolation(
+        sample_rate: u32,
+        frame_size: usize,
+        model_path: String,
+    ) -> anyhow::Result<Self> {
         let vi = VoiceIsolation::new(model_path)?;
         Ok(Self {
             sample_rate,
@@ -52,7 +56,7 @@ impl AudioProcessor {
     /// Process an audio frame (PCM i16)
     pub fn process_frame(&mut self, pcm_data: &[i16]) -> anyhow::Result<ProcessedFrame> {
         self.frames_processed += 1;
-        
+
         // Convert to float
         let float_data = pcm_to_float(pcm_data);
 
@@ -149,7 +153,8 @@ pub fn pcm_to_float(pcm: &[i16]) -> Vec<f32> {
 
 /// Convert float samples to PCM i16
 pub fn float_to_pcm(float_data: &[f32]) -> Vec<i16> {
-    float_data.iter()
+    float_data
+        .iter()
         .map(|&x| (x * 32767.0).clamp(-32768.0, 32767.0) as i16)
         .collect()
 }
@@ -173,10 +178,10 @@ mod tests {
     fn test_process_frame() {
         let mut processor = AudioProcessor::new(16000, 320);
         let pcm_data = vec![100i16; 320];
-        
+
         let result = processor.process_frame(&pcm_data);
         assert!(result.is_ok());
-        
+
         let frame = result.unwrap();
         assert_eq!(frame.pcm.len(), 320);
         assert!(frame.vad_probability >= 0.0 && frame.vad_probability <= 1.0);
@@ -187,7 +192,7 @@ mod tests {
     fn test_process_silence() {
         let mut processor = AudioProcessor::new(16000, 320);
         let silent_data = vec![0i16; 320];
-        
+
         let frame = processor.process_frame(&silent_data).unwrap();
         assert!(frame.vad_probability < 0.5);
     }
@@ -197,7 +202,7 @@ mod tests {
         let original = vec![100i16, -200, 32000, -32000, 0];
         let float_data = pcm_to_float(&original);
         let back = float_to_pcm(&float_data);
-        
+
         for (o, b) in original.iter().zip(back.iter()) {
             assert!((o - b).abs() <= 1); // Allow for rounding
         }
