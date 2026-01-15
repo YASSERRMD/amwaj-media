@@ -22,32 +22,32 @@
 
 ---
 
-## 🌊 Overview
+## Overview
 
 **Amwaj** (Arabic for *waves*) is a specialized media server built in Rust, designed to handle the critical I/O layer for conversational AI agents. It bridges the gap between WebRTC clients and AI orchestrators, providing ultra-low latency audio streaming, advanced voice processing, and seamless turn-taking orchestration.
 
 Designed for scalability and performance, Amwaj handles the "dirty work" of real-time audio—jitter buffering, packet loss concealment, VAD, and voice isolation—so your AI models can focus on intelligence.
 
-## ✨ Features
+## Features
 
-### 🚀 Core Capabilities
+### Core Capabilities
 - **Ultra-Low Latency Streaming**: Built on a high-performance Rust WebRTC stack with custom RTP handling.
 - **Opus Codec**: Full support for Opus encoding/decoding with adaptive bitrate and Forward Error Correction (FEC).
 - **gRPC Interface**: Bidirectional streaming API for easy integration with Python/Go/Node.js AI orchestrators.
 - **NAT Traversal**: Built-in STUN/TURN client and ICE candidate gathering for robust connectivity.
 
-### 🧠 Intelligent Audio Processing
+### Intelligent Audio Processing
 - **Advanced VAD**: Energy-based and ONNX-powered Voice Activity Detection for precise end-of-speech detection.
 - **Voice Isolation**: Real-time noise suppression and voice isolation using ONNX Runtime.
 - **Turn-Taking Engine**: State-machine-based interruption handling (Barge-in) and silence detection.
 - **Feature Extraction**: Real-time extraction of pitch, volume, and spectral features.
 
-### 🏭 Production Ready
+### Production Ready
 - **Distributed State**: Redis-backed session management for horizontal scaling.
 - **Observability**: Prometheus metrics exporter and structured distributed tracing.
 - **Kubernetes Native**: Ready-to-deploy Helm charts and manifests for K8s clusters.
 
-## 🏗 Architecture
+## Architecture
 
 ```mermaid
 graph TD
@@ -68,7 +68,7 @@ graph TD
     end
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Rust 1.75+
@@ -113,7 +113,7 @@ sample_rate = 16000
 vad_sensitivity = 0.6
 ```
 
-## 📦 Deployment
+## Deployment
 
 ### Docker
 
@@ -130,7 +130,7 @@ Amwaj is ready for K8s. Apply the manifests in the `k8s/` directory:
 kubectl apply -f k8s/
 ```
 
-## 📊 Metrics & Monitoring
+## Metrics & Monitoring
 
 Amwaj exposes Prometheus metrics at `http://localhost:9090/metrics`.
 
@@ -142,16 +142,16 @@ Amwaj exposes Prometheus metrics at `http://localhost:9090/metrics`.
 | `amwaj_turn_events_detected` | Counter of turn-taking events (Start/End) |
 | `amwaj_rtp_packets_received` | Total RTP packets ingested |
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
 <p align="center">
-  Made with ❤️ by the Amwaj Team
+  Made by the Amwaj Team
 </p>
