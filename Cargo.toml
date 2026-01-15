@@ -1,0 +1,65 @@
+[package]
+name = "amwaj-media"
+version = "0.1.0"
+edition = "2021"
+authors = ["YASSERRMD"]
+license = "Apache-2.0"
+description = "Real-time media server for voice agents"
+repository = "https://github.com/amwaj-io/amwaj-media"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# gRPC
+tonic = "0.11"
+prost = "0.12"
+tonic-reflection = "0.11"
+
+# Metrics
+prometheus = "0.13"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# WebRTC (will use in Phase 2)
+webrtc = { version = "0.9", optional = true }
+
+# Audio processing (will use in Phase 2)
+ndarray = { version = "0.15", optional = true }
+ort = { version = "2.0.0-rc.11", optional = true }
+
+# Configuration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+clap = { version = "4.4", features = ["derive"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Utilities
+chrono = "0.4"
+uuid = { version = "1.6", features = ["v4"] }
+parking_lot = "0.12"
+crossbeam-channel = "0.5"
+num_cpus = "1.16"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tonic-build = "0.11"
+mockall = "0.12"
+
+[build-dependencies]
+tonic-build = "0.11"
+
+[features]
+default = []
+webrtc-feature = ["webrtc"]
+audio-feature = ["ndarray", "ort"]
+
+[[example]]
+name = "basic_server"
+path = "examples/basic_server.rs"
