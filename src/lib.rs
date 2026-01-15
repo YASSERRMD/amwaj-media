@@ -5,10 +5,11 @@
 //! # Overview
 //!
 //! Amwaj Media Server provides:
-//! - WebRTC streaming with RTP packet handling
-//! - Audio processing with VAD and feature extraction
+//! - WebRTC streaming with RTP packet handling and ICE/STUN/TURN
+//! - Audio processing with VAD, feature extraction, and voice isolation
 //! - Turn detection for conversational AI
 //! - gRPC bidirectional streaming
+//! - Distributed session management
 //! - Prometheus metrics and latency tracking
 //!
 //! # Example
@@ -33,6 +34,7 @@ pub mod detection;
 pub mod error;
 pub mod grpc;
 pub mod metrics;
+pub mod session;
 pub mod webrtc;
 
 pub use config::Config;
