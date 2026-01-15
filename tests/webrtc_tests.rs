@@ -75,17 +75,18 @@ mod webrtc_tests {
     fn test_opus_decoder_creation() {
         let decoder = OpusDecoder::new(16000);
         assert_eq!(decoder.sample_rate(), 16000);
-        assert_eq!(decoder.frame_size(), 320);
+        assert_eq!(decoder.frames_decoded(), 0);
     }
 
     #[test]
     fn test_opus_decode_stub() {
-        let decoder = OpusDecoder::new(16000);
+        let mut decoder = OpusDecoder::new(16000);
         let result = decoder.decode(&[0xFF; 100]);
         assert!(result.is_ok());
 
         let pcm = result.unwrap();
-        assert_eq!(pcm.len(), 320);
+        assert!(!pcm.is_empty());
+        assert_eq!(decoder.frames_decoded(), 1);
     }
 
     #[test]

@@ -82,7 +82,7 @@ mod audio_tests {
 
     #[test]
     fn test_voice_isolation_stub() {
-        let vi = VoiceIsolation::new("model.onnx".to_string()).unwrap();
+        let mut vi = VoiceIsolation::new("model.onnx".to_string()).unwrap();
         let audio = vec![0.5f32; 320];
 
         let result = vi.isolate(&audio);
