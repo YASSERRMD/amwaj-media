@@ -1,11 +1,13 @@
 //! WebRTC module for Amwaj Media Server
 
 pub mod codec;
+pub mod ice;
 pub mod jitter_buffer;
 pub mod peer_connection;
 pub mod rtp_handler;
 
-pub use codec::OpusDecoder;
+pub use codec::{OpusCodecManager, OpusConfig, OpusDecoder, OpusEncoder};
+pub use ice::{CandidateType, IceCandidate, IceGatherer, StunClient, TurnClient, TurnServerConfig};
 pub use jitter_buffer::JitterBuffer;
 pub use peer_connection::PeerConnection;
 pub use rtp_handler::RtpPacket;
