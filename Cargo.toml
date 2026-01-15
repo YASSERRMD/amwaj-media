@@ -26,9 +26,18 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 # WebRTC (will use in Phase 2)
 webrtc = { version = "0.9", optional = true }
 
-# Audio processing (will use in Phase 2)
+# Audio processing / ONNX (Phase 9)
 ndarray = { version = "0.15", optional = true }
 ort = { version = "2.0.0-rc.11", optional = true }
+
+# Opus codec (Phase 10)
+audiopus = { version = "0.3.0-rc.0", optional = true }
+
+# STUN/TURN NAT traversal (Phase 11)
+stun_codec = { version = "0.3", optional = true }
+
+# Redis for distributed sessions (Phase 12)
+redis = { version = "0.24", features = ["tokio-comp"], optional = true }
 
 # Configuration
 serde = { version = "1.0", features = ["derive"] }
@@ -46,6 +55,7 @@ uuid = { version = "1.6", features = ["v4"] }
 parking_lot = "0.12"
 crossbeam-channel = "0.5"
 num_cpus = "1.16"
+async-trait = "0.1"
 
 [dev-dependencies]
 tokio-test = "0.4"
@@ -59,6 +69,10 @@ tonic-build = "0.11"
 default = []
 webrtc-feature = ["webrtc"]
 audio-feature = ["ndarray", "ort"]
+opus-feature = ["audiopus"]
+stun-feature = ["stun_codec"]
+redis-feature = ["redis"]
+full = ["webrtc-feature", "audio-feature", "opus-feature", "stun-feature", "redis-feature"]
 
 [[example]]
 name = "basic_server"
